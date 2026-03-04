@@ -33,14 +33,21 @@ def send_telegram(message):
     })
 
 def fetch_artdeco_rings():
-    url = "https://www.elliade.com/collections/style-bague-art-deco/products.json?limit=250"
-    try:
-        resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
-        resp.raise_for_status()
-        return resp.json().get("products", [])
-    except Exception as e:
-        print(f"Erreur fetch art déco : {e}")
-        return []
+    urls = [
+        "https://www.elliade.com/collections/style-bague-art-deco/products.json?limit=250",
+        "https://www.elliade.com/collections/art-deco/products.json?limit=250",
+    ]
+    all_products = {}
+    for url in urls:
+        try:
+            resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
+            for p in resp.json().get("products", []):
+                all_products[p["id"]] = p  # dédoublonnage par ID
+        except Exception as e:
+            print(f"Erreur fetch : {e}")
+    return list(all_products.values())
+
 
 def get_available_sizes(product):
     import re
