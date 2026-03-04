@@ -33,7 +33,7 @@ def send_telegram(message):
     })
 
 def fetch_artdeco_rings():
-    url = "https://www.elliade.com/collections/art-deco/products.json?limit=250"
+    url = "https://www.elliade.com/collections/style-bague-art-deco/products.json?limit=250"
     try:
         resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
         resp.raise_for_status()
