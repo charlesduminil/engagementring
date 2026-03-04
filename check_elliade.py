@@ -43,12 +43,20 @@ def fetch_artdeco_rings():
         return []
 
 def get_available_sizes(product):
+    import re
+    # Cherche la taille dans le body_html (ex: "taille 52" ou "taille 51,5")
+    body = product.get("body_html", "")
+    matches = re.findall(r'taille\s+([\d]+(?:[,\.]\d)?)', body, re.IGNORECASE)
+    
     matched = []
-    for variant in product.get("variants", []):
-        t = variant.get("title", "").strip().replace(",", ".")
-        if t in SIZES_WANTED and variant.get("available", False):
-            matched.append(t)
-    return sorted(set(matched), key=lambda x: float(x))
+    for m in matches:
+        size = m.replace(",", ".")
+        if size in SIZES_WANTED:
+            # Vérifie si le produit est disponible
+            available = any(v.get("available", False) for v in product.get("variants", []))
+            if available:
+                matched.append(size)
+    return matched
 
 def get_min_price(product):
     prices = [float(v["price"]) for v in product.get("variants", []) if v.get("price")]
